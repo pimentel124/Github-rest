@@ -13,20 +13,52 @@ Don't forget to showcase what you do best.
 
 */
 
-export function listOrgRepositories( organization: string ) {
-    return fetch( `https://api.github.com/orgs/${organization}/repos`)
-    .then( ( response ) => response.json() )
-    .then( ( data ) => data.map( ( repo: { name: any; } ) => repo.name ) );
+/**
+ * @param {HTMLFormElement} element - Form to get organization from
+ * @returns {number} Number of public repos in the organization
+ * 
+ * Gets the number of public repos in the organization
+ */
+export async function getNumberOfOrgRepos(element: HTMLFormElement): Promise<number> {
+    const form = new FormData(element);
+    const org = form.get('organization') as string;
+    const response = await fetch(`https://api.github.com/orgs/${org}`);
+    const data = await response.json();
+    return data.public_repos;
 }
 
-export function getBiggestRepo( organization: string ) {
-    return fetch( `https://api.github.com/orgs/${organization}/repos`)
-    .then( ( response ) => response.json() )
-    .then( ( data ) => data.sort( ( a: { size: number; }, b: { size: number; } ) => b.size - a.size )[0].name );
-}
+/**
+ * @param {HTMLFormElement} element - Form to get organization from
+ * @returns {number} Size of the biggest repo
+ * 
+ * Gets the size of the biggest repo in the organization
+ */
+export async function getBiggestRepo(element: HTMLFormElement): Promise<string> {
+    const form = new FormData(element);
+    const organization = form.get('organization') as string;
+    const response = await fetch(`https://api.github.com/orgs/${organization}/repos`);
+  
+    if (!response.ok) {
+      throw new Error(`Error fetching repos: ${response.statusText}`);
+    }
+  
+    const data = await response.json();
+  
+    if (!Array.isArray(data)) {
+      throw new Error('Unexpected data format');
+    }
+  
+    const biggest = data.sort((a: { size: number }, b: { size: number }) => b.size - a.size)[0];
+    return `The biggest repo is ${biggest.name} with a size of ${biggest.size}`;
+  }
 
-export function getNumberOfOrganizations() {
-    return fetch( `https://api.github.com/search/users?q=type%3Aorg`)
-    .then( ( response ) => response.json() )
-    .then( ( data ) => data.total_count );
+/**
+ * @returns {number} Number of organizations
+ * 
+ * Gets the number of organizations
+ */
+export async function getNumberOfOrganizations(): Promise<number> {
+    const response = await fetch(`https://api.github.com/search/users?q=type:org`);
+    const data = await response.json();
+    return data.total_count;
 }
