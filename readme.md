@@ -28,6 +28,6 @@ npm run dev
 
 ## Reference links to test the application
 
-To get the number of repositories for an organization [here](https://github.com/<organization_name>)  
+To get the number of repositories of an organization [here](https://github.com/<organization_name>)  
 To test the size of any public repository you can use the [GitHub Repository Size extension](https://chrome.google.com/webstore/detail/github-repository-size/apnjnioapinblneaedefcnopcjepgkci/) for Chrome. Or you can use the [Github REST Api v3](https://docs.github.com/en/rest/reference/repos#get-a-repository) to get the size of a repository using the following endpoint: `https://api.github.com/repos/<owner>/<repo>`. Note the size presented in the endpoint is in kilobytes.  
 Get the total number of organizations on Github [here](https://github.com/search?q=type%3Aorg&type=users).
