@@ -18,7 +18,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <div class="card">
       <button id="get-all-orgs" type="button">Get number of orgs</button>
       <div id="counter">
-        <p class="org-counter">The number of orgs is 0</p>
+        <p class="org-counter"> </p>
       </div>
     </div>
   </div>
