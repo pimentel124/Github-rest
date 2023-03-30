@@ -27,50 +27,65 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   </div>
 `
 
-//Retrieve the String of the form and call the function to get the number of repositories
+
 
 const form = document.querySelector<HTMLFormElement>('#post')!;
+
+/*
 form.addEventListener('submit', (event) => {
   event.preventDefault();
   const body = getNumberOfOrgRepos(document.querySelector<HTMLFormElement>('#post')!);
   console.log(body);
 });
+*/
 
+/* When the form is changed, reset both output text*/
+form.addEventListener('change', (event) => {
+  event.preventDefault();
+  const text = document.querySelector<HTMLParagraphElement>('.repo-num')!;
+  text.innerHTML = ''; // reset the text in the paragraph
+  const text2 = document.querySelector<HTMLParagraphElement>('.biggest-repo')!;
+  text2.innerHTML = ''; // reset the text in the paragraph
+});
+
+
+/* When the button is clicked, get the number of repos in the organization*/
 const buttonGetRepoNum = document.querySelector<HTMLButtonElement>('#get-repo-num')!;
 buttonGetRepoNum.addEventListener('click', async (event) => {
   event.preventDefault();
-  const body = await getNumberOfOrgRepos(document.querySelector<HTMLFormElement>('#post')!);
+  const form = document.querySelector<HTMLFormElement>('#post')!;
+  const body = await getNumberOfOrgRepos(form);
   const text = document.querySelector<HTMLParagraphElement>('.repo-num')!;
-  text.innerHTML = `The number of public repos is ${body}`;
+  if (body) {
+    text.innerHTML = body;
+  } else {
+    throw new Error('Get repo num failed');
+  }
   console.log(body);
 });
 
-//Retrieve the String of the form and call the function to get the biggest repository
-
+/* When the button is clicked, get the biggest repo in the organization*/
 const buttonGetBiggestRepo = document.querySelector<HTMLButtonElement>('#get-biggest-repo')!;
 buttonGetBiggestRepo.addEventListener('click', async (event) => {
   event.preventDefault();
   const body = await getBiggestRepo(document.querySelector<HTMLFormElement>('#post')!);
   const text = document.querySelector<HTMLParagraphElement>('.biggest-repo')!;
-  text.innerHTML = body;
+  if (body) {
+    text.innerHTML = body;
+  } else {
+    throw new Error('Get biggest repo failed');
+  }
   console.log(body);
 });
 
 
-//Retrieve the number of organizations
-
+/* When the button is clicked, get the number of organizations*/
 const button = document.querySelector<HTMLButtonElement>('#get-all-orgs')!;
 button.addEventListener('click', async (event) => {
   event.preventDefault();
-  const counter = await getNumberOfOrganizations();
+  const numberOfOrganizations = await getNumberOfOrganizations();
   const text = document.querySelector<HTMLParagraphElement>('.org-counter')!;
-  text.innerHTML = `The number of orgs is ${counter}`;
-  console.log(counter);
+  text.innerHTML = `The number of organizations is ${numberOfOrganizations}`;
+  console.log(numberOfOrganizations);
 });
 
-
-//listOrgRepositories(document.querySelector<HTMLFormElement>('#post')!);
-
-
-
-//console.log(getNumberOfOrganizations())

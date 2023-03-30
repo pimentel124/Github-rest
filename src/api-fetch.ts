@@ -15,47 +15,59 @@ Don't forget to showcase what you do best.
 
 /**
  * @param {HTMLFormElement} element - Form to get organization from
- * @returns {number} Number of public repos in the organization
+ * @returns {string} Response with the number of public repos in the organization
  * 
- * Gets the number of public repos in the organization
  */
-export async function getNumberOfOrgRepos(element: HTMLFormElement): Promise<number> {
+export async function getNumberOfOrgRepos(element: HTMLFormElement): Promise<string> {
     const form = new FormData(element);
     const org = form.get('organization') as string;
+    if (!org) {
+      return 'Please enter an organization';
+    }
     const response = await fetch(`https://api.github.com/orgs/${org}`);
     const data = await response.json();
-    return data.public_repos;
+    return `The number of public repos is ${data.public_repos}`;
 }
 
 /**
  * @param {HTMLFormElement} element - Form to get organization from
- * @returns {number} Size of the biggest repo
+ * @returns {string} Response with the name and size of the biggest repo
  * 
- * Gets the size of the biggest repo in the organization
  */
 export async function getBiggestRepo(element: HTMLFormElement): Promise<string> {
-    const form = new FormData(element);
-    const organization = form.get('organization') as string;
-    const response = await fetch(`https://api.github.com/orgs/${organization}/repos`);
-  
+  const form = new FormData(element);
+  const org = form.get('organization') as string;
+  if (!org) {
+    return 'Please enter an organization';
+  }
+  let page = 1;
+  let allRepos: any[] = [];
+
+  // Retrieve all pages of the organization's repositories
+  while (true) {
+    const response = await fetch(`https://api.github.com/orgs/${org}/repos?per_page=100&page=${page}`);
     if (!response.ok) {
       throw new Error(`Error fetching repos: ${response.statusText}`);
     }
-  
     const data = await response.json();
-  
     if (!Array.isArray(data)) {
       throw new Error('Unexpected data format');
     }
-  
-    const biggest = data.sort((a: { size: number }, b: { size: number }) => b.size - a.size)[0];
-    return `The biggest repo is ${biggest.name} with a size of ${biggest.size}`;
+    allRepos = allRepos.concat(data);
+    if (data.length < 100) {
+      break;
+    }
+    page++;
   }
 
+  // Find the biggest repository
+  const biggest = allRepos.sort((a: { size: number }, b: { size: number }) => b.size - a.size)[0];
+  return `The biggest repo is ${biggest.name} with a size of ${biggest.size} bytes`;
+}
+
 /**
- * @returns {number} Number of organizations
+ * @returns {number} Number of organizations in Github
  * 
- * Gets the number of organizations
  */
 export async function getNumberOfOrganizations(): Promise<number> {
     const response = await fetch(`https://api.github.com/search/users?q=type:org`);
