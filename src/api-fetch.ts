@@ -63,7 +63,8 @@ export async function getBiggestRepo(element: HTMLFormElement): Promise<string> 
 
   // Find the biggest repository
   const biggest = allRepos.sort((a: { size: number }, b: { size: number }) => b.size - a.size)[0];
-  return `The biggest repo is ${biggest.name} with a size of ${biggest.size} bytes`;
+  // Convert size from kilobytes to bytes
+  return `The biggest repo is ${biggest.name} with a size of ${biggest.size * 1024} bytes`;
 }
 
 /**
