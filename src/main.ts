@@ -11,11 +11,8 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       <br>
       <button id="get-repo-num" type="button">Get repository count</button>
       <button id="get-biggest-repo" type="button">Get biggest repository</button>
-      <div id="repo-num">
-        <p class="repo-num"></p>
-      </div>
-      <div id="biggest-repo">
-        <p class="biggest-repo"></p>
+      <div id="repo-output">
+        <p class="repo-output"></p>
       </div>
     </div>
     <div class="card">
@@ -42,10 +39,8 @@ form.addEventListener('submit', (event) => {
 /* When the form is changed, reset both output text*/
 form.addEventListener('change', (event) => {
   event.preventDefault();
-  const text = document.querySelector<HTMLParagraphElement>('.repo-num')!;
+  const text = document.querySelector<HTMLParagraphElement>('.repo-output')!;
   text.innerHTML = ''; // reset the text in the paragraph
-  const text2 = document.querySelector<HTMLParagraphElement>('.biggest-repo')!;
-  text2.innerHTML = ''; // reset the text in the paragraph
 });
 
 
@@ -55,7 +50,7 @@ buttonGetRepoNum.addEventListener('click', async (event) => {
   event.preventDefault();
   const form = document.querySelector<HTMLFormElement>('#post')!;
   const body = await getNumberOfOrgRepos(form);
-  const text = document.querySelector<HTMLParagraphElement>('.repo-num')!;
+  const text = document.querySelector<HTMLParagraphElement>('.repo-output')!;
   if (body) {
     text.innerHTML = body;
   } else {
@@ -68,8 +63,10 @@ buttonGetRepoNum.addEventListener('click', async (event) => {
 const buttonGetBiggestRepo = document.querySelector<HTMLButtonElement>('#get-biggest-repo')!;
 buttonGetBiggestRepo.addEventListener('click', async (event) => {
   event.preventDefault();
+  const text = document.querySelector<HTMLParagraphElement>('.repo-output')!;
+  text.innerHTML = 'Loading...'; // reset the text in the paragraph
   const body = await getBiggestRepo(document.querySelector<HTMLFormElement>('#post')!);
-  const text = document.querySelector<HTMLParagraphElement>('.biggest-repo')!;
+  
   if (body) {
     text.innerHTML = body;
   } else {
