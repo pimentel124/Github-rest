@@ -56,7 +56,7 @@ buttonGetRepoNum.addEventListener('click', async (event) => {
   } else {
     throw new Error('Get repo num failed');
   }
-  console.log(body);
+  //console.log(body);
 });
 
 /* When the button is clicked, get the biggest repo in the organization*/
@@ -72,7 +72,7 @@ buttonGetBiggestRepo.addEventListener('click', async (event) => {
   } else {
     throw new Error('Get biggest repo failed');
   }
-  console.log(body);
+  //console.log(body);
 });
 
 
@@ -83,6 +83,6 @@ button.addEventListener('click', async (event) => {
   const numberOfOrganizations = await getNumberOfOrganizations();
   const text = document.querySelector<HTMLParagraphElement>('.org-counter')!;
   text.innerHTML = `There are ${numberOfOrganizations} current organizations in Github`;
-  console.log(numberOfOrganizations);
+  //console.log(numberOfOrganizations);
 });
 
