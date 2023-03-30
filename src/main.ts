@@ -82,7 +82,7 @@ button.addEventListener('click', async (event) => {
   event.preventDefault();
   const numberOfOrganizations = await getNumberOfOrganizations();
   const text = document.querySelector<HTMLParagraphElement>('.org-counter')!;
-  text.innerHTML = `The number of organizations is ${numberOfOrganizations}`;
+  text.innerHTML = `There are ${numberOfOrganizations} current organizations in Github`;
   console.log(numberOfOrganizations);
 });
 
