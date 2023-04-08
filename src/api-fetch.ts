@@ -1,4 +1,3 @@
-
 /*
 Using the Github REST Api v3 or Github Api v4 with GraphQL build the following
 functionalities using the programming language and technologies of your choice:
@@ -12,6 +11,9 @@ You should include a brief documentation on how to use or test your solution.
 Don't forget to showcase what you do best.
 
 */
+
+//Size of each page of repos to fetch from the API. Default is 30
+const pageSize = 100;
 
 /**
  * @param {HTMLFormElement} element - Form to get organization from
@@ -29,43 +31,6 @@ export async function getNumberOfOrgRepos(element: HTMLFormElement): Promise<str
     return `The number of public repos is ${data.public_repos}`;
 }
 
-/**
- * @param {HTMLFormElement} element - Form to get organization from
- * @returns {string} Response with the name and size of the biggest repo
- * 
- */
-export async function getBiggestRepo(element: HTMLFormElement): Promise<string> {
-  const form = new FormData(element);
-  const org = form.get('organization') as string;
-  if (!org) {
-    //make a toast
-    return 'Please enter an organization';
-  }
-  let page = 1;
-  let allRepos: any[] = [];
-
-  // Retrieve all pages of the organization's repositories
-  while (true) {
-    const response = await fetch(`https://api.github.com/orgs/${org}/repos?per_page=100&page=${page}`);
-    if (!response.ok) {
-      throw new Error(`Error fetching repos: ${response.statusText}`);
-    }
-    const data = await response.json();
-    if (!Array.isArray(data)) {
-      throw new Error('Unexpected data format');
-    }
-    allRepos = allRepos.concat(data);
-    if (data.length < 100) {
-      break;
-    }
-    page++;
-  }
-
-  // Find the biggest repository
-  const biggest = allRepos.sort((a: { size: number }, b: { size: number }) => b.size - a.size)[0];
-  // Convert size from kilobytes to bytes
-  return `The biggest repo is ${biggest.name} with a size of ${biggest.size * 1024} bytes`;
-}
 
 /**
  * @returns {number} Number of organizations in Github
@@ -77,3 +42,53 @@ export async function getNumberOfOrganizations(): Promise<number> {
     return data.total_count;
 }
 
+
+// Interface for the repo object returned by the API to make it easier to read
+interface Repo {
+  name: string;
+  size: number;
+}
+
+/**
+ * @param {HTMLFormElement} formElement - Form to get organization from
+ * @returns {string} Response with the name and size of the biggest repo
+ * 
+ */
+export async function getBiggestRepo(formElement: HTMLFormElement): Promise<string> {
+  const form = new FormData(formElement);
+  const org = form.get('organization') as string;
+  if (!org) {
+    return 'Please enter an organization';
+  }
+  let page = 1;
+  let allRepos: Repo[] = [];
+  let done = false;
+
+  while (!done) {
+    // 5 Requests made in parallel
+    const requests = Array.from({ length: 5 }, (_, i) =>
+      fetch(`https://api.github.com/orgs/${org}/repos?per_page=${pageSize}&page=${page + i}`)
+    );
+    const responses = await Promise.all(requests);
+    done = true;
+    for (const response of responses) {
+      // Check for errors in each response
+      if (!response.ok) {
+        throw new Error(`Error fetching repos: ${response.statusText}`);
+      }
+      const data = await response.json();
+      if (!Array.isArray(data)) {
+        throw new Error('Unexpected data format');
+      }
+      allRepos = allRepos.concat(data);
+      if (data.length === 100) {
+        done = false;
+      }
+      page++;
+    }
+  }
+  // Sorting the array of repos by size in descending order
+  allRepos.sort((a, b) => b.size - a.size);
+  // Converting size from kilobytes to bytes
+  return `The biggest repo is ${allRepos[0].name} with a size of ${allRepos[0].size * 1024} bytes`;
+}
